@@ -10,8 +10,13 @@
   <script>
     if (annyang) {
       // Add our commands to annyang
+      var goToLocation = function(location) {
+        alert('location');
+      }
+
       annyang.addCommands({
-        'hello': function() { alert('Hello world!'); }
+        // 'hello': function() { alert('Hello world!'); }
+        'go (to) :location': goToLocation
       });
 
       // Tell KITT to use annyang
@@ -29,7 +34,7 @@
       // Render KITT's interface
       SpeechKITT.vroom();
     }
-</script>
+  </script>
 
 </body>
 
