@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <title>fetch_delivery</title>
+        <script src="{{ url_for('static'), filename='js/speechkitt.js' }}"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+    </head>
+
+    <body>
+        <form method="post" action="{{ url_for('pos') }}">
+            <input type="number" step="any" placeholder="x" name="x"></input><br>
+            <input type="number" step="any" placeholder="y" name="y"></input>
+            <input type="submit">
+        </form>
+    </body>
+</html>
