@@ -59,16 +59,34 @@ def teardown_request(exception):
 
 @app.route('/')
 def index():
-    cursor = g.conn.execute("SELECT L.name FROM locations L")
+    cursor = g.conn.execute("SELECT L.name, L.x, L.y, L.z FROM locations L")
     data = []
     for result in cursor:
-      entry_dict = {"location": result[0]}
+      entry_dict = {"location": result[0], "x": result[1], "y": result[2], "z": result[3]}
       data.append(entry_dict)
     cursor.close()
 
     context = dict(data = data)
 
     return render_template('index.html', **context)
+
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+  error = ""
+
+  if request.method == 'POST':
+    name = request.form['name']
+    x = request.form['x']
+    y = request.form['y']
+    z = request.form['z']
+
+    try:
+      g.conn.execute('INSERT INTO locations(name, x, y, z) VALUES ((%s), (%s), (%s), (%s))', name, x, y, z)
+    except:
+      error = "error inserting location"
+
+  return render_template('add.html', error=error)
+
 
 @app.route('/pos/', methods=['POST'])
 def pos():
