@@ -3,6 +3,36 @@
         <title>fetch_delivery</title>
         <script src="static/js/speechkitt.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+        <script src="speechkitt.js"></script>
+        <script>
+        if (annyang) {
+          // Add our commands to annyang
+          var goToLocation = function(location) {
+            alert('location');
+          }
+
+          annyang.addCommands({
+            // 'hello': function() { alert('Hello world!'); }
+            'go (to) :location': goToLocation
+          });
+
+          // Tell KITT to use annyang
+          SpeechKITT.annyang();
+
+          // Define a stylesheet for KITT to use
+          SpeechKITT.setStylesheet('https://cdnjs.cloudflare.com/ajax/libs/SpeechKITT/0.3.0/themes/flat.css');
+
+          SpeechKITT.setInstructionsText('Some commands to try...');
+
+          SpeechKITT.setSampleCommands(['Go to room 500']);
+
+          SpeechKITT.displayRecognizedSentence(true);
+
+          // Render KITT's interface
+          SpeechKITT.vroom();
+        }
+        </script>
     </head>
 
     <body>
