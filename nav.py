@@ -2,24 +2,24 @@
 
 import csv
 import copy
-import actionlib
-import rospy
-import roslib
+# import actionlib
+# import rospy
+# import roslib
 
 import threading
 
-from math import sin, cos
-from moveit_python import (MoveGroupInterface,
-                           PlanningSceneInterface,
-                           PickPlaceInterface)
-from moveit_python.geometry import rotate_pose_msg_by_euler_angles
+# from math import sin, cos
+# from moveit_python import (MoveGroupInterface,
+#                            PlanningSceneInterface,
+#                            PickPlaceInterface)
+# from moveit_python.geometry import rotate_pose_msg_by_euler_angles
 
-from geometry_msgs.msg import PoseStamped
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
-from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes
+# from geometry_msgs.msg import PoseStamped
+# from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+# from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes
 
-from sqlalchemy import *
-from sqlalchemy.pool import NullPool
+# from sqlalchemy import *
+# from sqlalchemy.pool import NullPool
 from flask import Flask, render_template, request, url_for
 
 app = Flask(__name__)
@@ -28,7 +28,21 @@ y = 0
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    nav_list = []
+    with open("navigation_labels.txt", 'r') as f:
+        reader = csv.reader(f)
+        nav_list = list(reader)
+        f.close()
+
+    print(nav_list)
+
+    data = []
+    for loc in nav_list:
+        entry_dict = {"location": loc[0], "x": loc[1], "y": loc[2]}
+        data.append(entry_dict)
+
+    context = dict(data = data)
+    return render_template('index.html', **context)
 
 @app.route('/pos', methods=['GET', 'POST'])
 def pos():
@@ -48,10 +62,29 @@ def pos():
 
     # x = float(request.form['x'])
     # y = float(request.form['y'])
-    print "X: %d, Y: %d" % (x, y)
+    print("X: %d, Y: %d" % (x, y))
     return render_template('index.html')
 
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    error = ""
 
+    if request.method == 'POST':
+        name = request.form['name']
+        x = request.form['x']
+        y = request.form['y']
+        z = request.form['z']
+
+        out_file = open("navigation_labels.txt", 'a')
+        out_file.write('\n' + name + ", " + x + ", " + y)
+        out_file.close()
+
+        # try:
+        #   g.conn.execute('INSERT INTO locations(name, x, y, z) VALUES ((%s), (%s), (%s), (%s))', name, x, y, z)
+        # except:
+        #   error = "error inserting location"
+
+    return render_template('add.html', error=error)
 
 def start_server():
     app.run(host=host, port=port)
@@ -79,28 +112,30 @@ class MoveBaseClient(object):
 
 if __name__ == "__main__":
     # Create a node
-    rospy.init_node("demo")
+    # rospy.init_node("demo")
 
     host = "0.0.0.0"
     port = 5000
 
+    start_server()
+
     # start webserver on a separate thread from ros
-    t = threading.Thread(target=start_server)
-    t.daemon=True
-    t.start()
+    # t = threading.Thread(target=start_server)
+    # t.daemon=True
+    # t.start()
 
-    # Make sure sim time is working
-    while not rospy.Time.now():
-        pass
+    # # Make sure sim time is working
+    # while not rospy.Time.now():
+    #     pass
 
-    # Setup clients
-    move_base = MoveBaseClient()
+    # # Setup clients
+    # move_base = MoveBaseClient()
 
-    while not rospy.is_shutdown():
+    # while not rospy.is_shutdown():
 
-        # prevent assumption that destination is (0, 0)
-        if x == 0 and y == 0:
-            continue
-        rospy.loginfo(x)
-        rospy.loginfo(y)
-        move_base.goto(x, y, 0.0)
+    #     # prevent assumption that destination is (0, 0)
+    #     if x == 0 and y == 0:
+    #         continue
+    #     rospy.loginfo(x)
+    #     rospy.loginfo(y)
+    #     move_base.goto(x, y, 0.0)
