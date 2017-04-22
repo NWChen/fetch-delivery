@@ -2,14 +2,29 @@
     <head>
         <title>fetch_delivery</title>
         <script src="static/js/speechkitt.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
-        <script src="speechkitt.js"></script>
+    </head>
+
+    <body>
         <script>
+        console.log("ANNYANG ABOUT TO RUN");
         if (annyang) {
+          console.log("ANNYANG RUNNING");
           // Add our commands to annyang
           var goToLocation = function(location) {
-            alert('location');
+            console.log(location);
+            $.ajax({
+                url: '/pos',
+                type: 'POST',
+                data: JSON.stringify({ "location" : location}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function(res) {
+                    console.log("Successful position sent");
+                }
+            });
           }
 
           annyang.addCommands({
@@ -31,11 +46,11 @@
 
           // Render KITT's interface
           SpeechKITT.vroom();
+
+          console.log("END OF JS");
         }
         </script>
-    </head>
 
-    <body>
         <form method="post" action="{{ url_for('pos') }}">
             <input type="number" step="any" placeholder="x" name="x"></input><br>
             <input type="number" step="any" placeholder="y" name="y"></input>
