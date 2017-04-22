@@ -28,7 +28,21 @@ y = 0
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    nav_list = []
+    with open("navigation_labels.txt", 'r') as f:
+        reader = csv.reader(f)
+        nav_list = list(reader)
+        f.close()
+
+    print(nav_list)
+
+    data = []
+    for loc in nav_list:
+        entry_dict = {"location": loc[0], "x": loc[1], "y": loc[2]}
+        data.append(entry_dict)
+
+    context = dict(data = data)
+    return render_template('index.html', **context)
 
 @app.route('/pos', methods=['GET', 'POST'])
 def pos():
