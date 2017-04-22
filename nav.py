@@ -33,6 +33,7 @@ def index():
 @app.route('/pos', methods=['GET', 'POST'])
 def pos():
     location_name = request.args.get('location')
+    nav_list = []
     with open("navigation_labels.txt", 'r') as f:
         reader = csv.reader(f)
         nav_list = list(reader)
