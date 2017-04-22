@@ -32,12 +32,25 @@ def index():
 
 @app.route('/pos', methods=['GET', 'POST'])
 def pos():
+    location_name = request.args.get('location')
+    with open("navigation_labels.txt", 'r') as f:
+        reader = csv.reader(f)
+        nav_list = list(reader)
+        f.close()
+
     global x
     global y
-    x = float(request.form['x'])
-    y = float(request.form['y'])
+    for loc in nav_list:
+        if loc[0] == location_name:
+            x = float(loc[1])
+            y = float(loc[2])
+
+    # x = float(request.form['x'])
+    # y = float(request.form['y'])
     print "X: %d, Y: %d" % (x, y)
     return render_template('index.html')
+
+
 
 def start_server():
     app.run(host=host, port=port)
