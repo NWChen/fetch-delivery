@@ -50,7 +50,26 @@ def pos():
     print "X: %d, Y: %d" % (x, y)
     return render_template('index.html')
 
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    error = ""
 
+    if request.method == 'POST':
+        name = request.form['name']
+        x = request.form['x']
+        y = request.form['y']
+        z = request.form['z']
+
+    out_file = open("navigation_labels.txt", 'a')
+    out_file.write(name + ", " + x + ", " + y)
+    out_file.close()
+
+        # try:
+        #   g.conn.execute('INSERT INTO locations(name, x, y, z) VALUES ((%s), (%s), (%s), (%s))', name, x, y, z)
+        # except:
+        #   error = "error inserting location"
+
+    return render_template('add.html', error=error)
 
 def start_server():
     app.run(host=host, port=port)
