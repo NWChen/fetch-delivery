@@ -12,66 +12,64 @@ def findLargestContour(contours):
 	max_area = 0
 	maxIndex = -1
 	for i in range(len(contours)):
-		cnt=contours[i]
+		cnt = contours[i]
 		area = cv2.contourArea(cnt)
-		if(area>max_area):
-			max_area=area
-			maxIndex=i
+		if(area > max_area):
+			max_area = area
+			maxIndex = i
 	return contours[maxIndex]
 
 
-#camera = PiCamera()
-#rawCapture = PiRGBArray(camera)
-camera = cv2.VideoCapture(0)
-sleep(.5)
-shifter_color = np.uint8([10, 40, 40])
-masker = sm.ColorSelector(shifter_color)
-initialArea = None
-initialCentroid = None
+def colorDetect():
 
-#for frame in camera.capture_continuous(rawCapture, format = 'bgr', use_video_port = True):
-while True:
-	_ret, image = camera.read()
-	#image = frame.array
-	image = cv2.flip(image,1)
-	masker.loadImage(image)
-	mask1 = masker.getMask()
+	#camera = PiCamera()
+	#rawCapture = PiRGBArray(camera)
+	camera = cv2.VideoCapture(0)
+	sleep(.5)
+	shifter_color = np.uint8([10, 40, 40])
+	masker = sm.ColorSelector(shifter_color)
+	initialArea = None
+	initialCentroid = None
 
-	_,cnts,_ = cv2.findContours(mask1.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	if len(cnts) > 0: 	
-		blob=findLargestContour(cnts)
-		currentArea = cv2.contourArea(blob)
-		M = cv2.moments(blob)
-		cx = int(M['m10']/M['m00'])
+	#for frame in camera.capture_continuous(rawCapture, format = 'bgr', use_video_port = True):
+	while True:
 
-		if initialArea is None:
-			initialArea = currentArea
-			initialCentroid = cx
+		image = cv2.imread('fetch.jpg')
+		masker.loadImage(image)
+		mask1 = masker.getMask()
 
-		areaRatio = currentArea/initialArea
-		print "New Area/Initial Area: ", areaRatio
-		print "New Centroid, Initial Centroid", initialCentroid, cx
-		# do robotic adjustment based on area ratio or difference
-		
-		if cx < initialCentroid-50: #moving out of center:
-			print "RIGHT"
-		if cx > initialCentroid+50:
-			print "LEFT"
+		_,cnts,_ = cv2.findContours(mask1.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+		if len(cnts) > 0: 	
+			blob = findLargestContour(cnts)
+			currentArea = cv2.contourArea(blob)
+			M = cv2.moments(blob)
+			cx = int(M['m10']/M['m00'])
 
-		if abs(cx-initialCentroid) < 50:
-			if areaRatio >1.5:
-				print "BACKWARD"
-				sleep(.1)
+			if initialArea is None:
+				initialArea = currentArea
+				initialCentroid = cx
 
-			if areaRatio < .7:
-				print "FORWARD"
-				sleep(.1)
+			areaRatio = currentArea/initialArea
+			print "New Area/Initial Area: ", areaRatio
+			print "New Centroid, Initial Centroid", initialCentroid, cx
+			# do robotic adjustment based on area ratio or difference
+			
+			if cx < initialCentroid - 50: #moving out of center:
+				print "RIGHT"
+			if cx > initialCentroid + 50:
+				print "LEFT"
+
+			if abs(cx-initialCentroid) < 50:
+				if areaRatio >1.5:
+					print "BACKWARD"
+					sleep(.1)
+
+				if areaRatio < .7:
+					print "FORWARD"
+					sleep(.1)
 
 
-
-		#same thing with centroid (really only x centroid matters because it can only rotate left right not up down)
-	#rawCapture.truncate(0)
-	if cv2.waitKey(10)==27:
-		break
+		if cv2.waitKey(10)==27:
+			break
 
 
