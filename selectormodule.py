@@ -41,6 +41,8 @@ class ColorSelector:
 	# Creates a mask out of the image and the color range
 	def getMask(self):
 		h,w=self.image.shape[:2]
+		print "HEIGHT %d", h
+		print "WIDTH %d", w
         self.image = cv2.resize(self.image,((int(w*.5),int(h*.5))), interpolation = cv2.INTER_AREA)
 		cv2.namedWindow("image")
 		cv2.setMouseCallback("image", self.getColor)
