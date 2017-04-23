@@ -25,12 +25,15 @@ masker = sm.ColorSelector(shifter_color)
 initialArea, initialCentroid = None, None
 
 def get_direction():
+    print "CALLED GET DIRECTION"
     image = cv2.imread(RAW_IMAGE)
     masker.loadImage(image)
     mask = masker.getMask()
-
+    print mask
+    direction = ''
     _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if len(cnts) > 0:
+        print "CNTS LENGTH: " + str(len(cnts))
         blob = findLargestContour(cnts)
         currentArea = cv2.contourArea(blob)
         M = cv2.moments(blob)
@@ -44,7 +47,6 @@ def get_direction():
         print "New Area/Initial Area: ", areaRatio
         print "New Centroid, Initial Centroid", initialCentroid, cx
 
-        direction = ''
         if cx < intialCentroid - 50:
             print "LEFT"
             direction = 'l'
@@ -64,18 +66,22 @@ def get_direction():
 def follow():
     pub = rospy.Publisher("/base_controller/command", Twist, queue_size=10)
     rospy.init_node("follow", anonymous=True)
-    rate = rospy.Rate(15)
+    rate = rospy.Rate(1)
 
     msg = Twist()
     while not rospy.is_shutdown():
+        print "FETCH ALIVE"
         msg.linear.x = 0.0 # Temporary; forces the robot to turn only
         direction = get_direction()
+        print direction
         if direction == 'l':
             msg.angular.z = -0.5
         elif direction == 'r':
             msg.angular.z = 0.5
+        else:
+            msg.angular.z = 0.0
         pub.publish(msg)
-        rate.sleep()
+        rospy.sleep(rospy.Duration(1,0))
 
 if __name__ == "__main__":
     try:

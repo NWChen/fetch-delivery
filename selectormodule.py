@@ -33,9 +33,6 @@ class ColorSelector:
 				self.lwr, self.upr = self.getColorRange()
 				self.clickPoints = []
 
-
-
-
 	def setWindow(self):
 		cv2.namedWindow("image")
 		cv2.setMouseCallback("image", self.getColor)
@@ -43,10 +40,8 @@ class ColorSelector:
 
 	# Creates a mask out of the image and the color range
 	def getMask(self):
-
 		h,w=self.image.shape[:2]
-		self.image = cv2.resize(self.image,((int(w*.5),int(h*.5))), interpolation = cv2.INTER_AREA)
-		
+        self.image = cv2.resize(self.image,((int(w*.5),int(h*.5))), interpolation = cv2.INTER_AREA)
 		cv2.namedWindow("image")
 		cv2.setMouseCallback("image", self.getColor)
 		cv2.imshow("image",self.image)
