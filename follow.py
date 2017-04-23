@@ -59,6 +59,7 @@ def get_direction():
             if areaRatio < 0.7:
                 print "FORWARD"
                 direction = 'f'
+    return direction
 
 def follow():
     pub = rospy.Publisher("/base_controller/command", Twist, queue_size=10)
