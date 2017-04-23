@@ -3,6 +3,7 @@ import copy
 import actionlib
 import rospy
 import roslib
+import math
 
 import selectormodule as sm
 import cv2
@@ -78,10 +79,10 @@ def get_direction():
     return direction
 
 def follow():
-    TOPIC = "cmd_vel" #/base_controller/command
-    pub = rospy.Publisher(TOPIC, Twist, queue_size=10)
-    rospy.init_node("follow", anonymous=True)
-    rate = rospy.Rate(1)
+    TOPIC = 'cmd_vel' #/base_controller/command
+    pub = rospy.Publisher(TOPIC, Twist, queue_size=1)
+    rospy.init_node('follow', anonymous=True)
+    rate = rospy.Rate(15)
 
     msg = Twist()
     while not rospy.is_shutdown():
@@ -90,13 +91,14 @@ def follow():
         direction = get_direction()
         print direction
         if direction == 'l' or direction == 'b':
-            msg.angular.z = -1.0
+            msg.angular.z = math.radians(-45)
         elif direction == 'r' or direction == 'f':
-            msg.angular.z = 1.0
+            msg.angular.z = math.radians(45)
         else:
             msg.angular.z = 0.0
+        print "ANGULAR Z: " + str(msg.angular.z)
         pub.publish(msg)
-        rospy.sleep(rospy.Duration(1,0))
+        rate.sleep()
 
 if __name__ == "__main__":
     try:
