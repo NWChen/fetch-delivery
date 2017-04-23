@@ -22,7 +22,19 @@ from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes
 RAW_IMAGE = "fetch.jpeg"
 shifter_color = np.uint8([10, 40, 40])
 masker = sm.ColorSelector(shifter_color)
-initialArea, initialCentroid = None, None
+initialArea = None
+initialCentroid = None
+
+def findLargestContour(contours):
+    max_area = 0
+    maxIndex = -1
+    for i in range(len(contours)):
+        cnt = contours[i]
+        area = cv2.contourArea(cnt)
+        if(area > max_area):
+            max_area = area
+            maxIndex = i
+    return contours[maxIndex]
 
 def get_direction():
     print "CALLED GET DIRECTION"
@@ -39,7 +51,9 @@ def get_direction():
         M = cv2.moments(blob)
         cx = int(M['m10']/M['m00'])
 
-        if initialArea is None:
+        global initialArea
+        global initialCentroid
+        if initialArea == None:
             initialArea = currentArea
             initialCentroid = cx
 
@@ -47,7 +61,7 @@ def get_direction():
         print "New Area/Initial Area: ", areaRatio
         print "New Centroid, Initial Centroid", initialCentroid, cx
 
-        if cx < intialCentroid - 50:
+        if cx < initialCentroid - 50:
             print "LEFT"
             direction = 'l'
         if cx > initialCentroid + 50:
@@ -64,7 +78,8 @@ def get_direction():
     return direction
 
 def follow():
-    pub = rospy.Publisher("/base_controller/command", Twist, queue_size=10)
+    TOPIC = "cmd_vel" #/base_controller/command
+    pub = rospy.Publisher(TOPIC, Twist, queue_size=10)
     rospy.init_node("follow", anonymous=True)
     rate = rospy.Rate(1)
 
@@ -74,10 +89,10 @@ def follow():
         msg.linear.x = 0.0 # Temporary; forces the robot to turn only
         direction = get_direction()
         print direction
-        if direction == 'l':
-            msg.angular.z = -0.5
-        elif direction == 'r':
-            msg.angular.z = 0.5
+        if direction == 'l' or direction == 'b':
+            msg.angular.z = -1.0
+        elif direction == 'r' or direction == 'f':
+            msg.angular.z = 1.0
         else:
             msg.angular.z = 0.0
         pub.publish(msg)

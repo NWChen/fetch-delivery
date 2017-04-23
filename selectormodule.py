@@ -43,22 +43,22 @@ class ColorSelector:
 		h,w=self.image.shape[:2]
 		print "HEIGHT %d", h
 		print "WIDTH %d", w
-        self.image = cv2.resize(self.image,((int(w*.5),int(h*.5))), interpolation = cv2.INTER_AREA)
+		self.image = cv2.resize(self.image,((int(w*.5),int(h*.5))), interpolation = cv2.INTER_AREA)
 		cv2.namedWindow("image")
 		cv2.setMouseCallback("image", self.getColor)
 		cv2.imshow("image",self.image)
 
 		mask = np.zeros( (int(h*.5),int(w*.5),), dtype = "uint8")
 
-	    lower_blue = np.array([110,50,50])
-	    upper_blue = np.array([130,255,255])
+		lower_blue = np.array([110,50,50])
+		upper_blue = np.array([130,255,255])
 
-	    # Threshold the HSV image to get only blue colors
+		# Threshold the HSV image to get only blue colors
 
 		hsv = cv2.cvtColor(self.image,cv2.COLOR_BGR2HSV)
 		
 		#creates the mask using the inRange function
-	    mask = cv2.inRange(hsv, lower_blue, upper_blue)	
+		mask = cv2.inRange(hsv, lower_blue, upper_blue)	
 
 		#performs some dilations and erosions to regularize mask
 		mask = cv2.medianBlur(mask,11)
