@@ -50,18 +50,22 @@ class ColorSelector:
 
 		mask = np.zeros( (int(h*.5),int(w*.5),), dtype = "uint8")
 
-		if self.lwr is not None and self.upr is not None:
-			
-			#creates the mask using the inRange function
-			hsv = cv2.cvtColor(self.image,cv2.COLOR_BGR2HSV)
-			mask = cv2.inRange(hsv,self.lwr, self.upr)
+	    lower_blue = np.array([110,50,50])
+	    upper_blue = np.array([130,255,255])
 
-			#performs some dilations and erosions to regularize mask
-			mask = cv2.medianBlur(mask,11)
-			kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-			kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
-			mask = cv2.erode(mask, kernel, iterations = 4)
-			mask = cv2.dilate(mask, kernel2, iterations = 4)
+	    # Threshold the HSV image to get only blue colors
+
+		hsv = cv2.cvtColor(self.image,cv2.COLOR_BGR2HSV)
+		
+		#creates the mask using the inRange function
+	    mask = cv2.inRange(hsv, lower_blue, upper_blue)	
+
+		#performs some dilations and erosions to regularize mask
+		mask = cv2.medianBlur(mask,11)
+		kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+		kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
+		mask = cv2.erode(mask, kernel, iterations = 4)
+		mask = cv2.dilate(mask, kernel2, iterations = 4)
 
 		cv2.imshow('mask',mask)
 		return mask
