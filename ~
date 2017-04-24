@@ -75,6 +75,10 @@ def pos():
     print "Y: " + str(y)
     return render_template('index.html')
 
+@app.route('/manual_pos', methods=['GET', 'POST'])
+def manual_pos():
+    request.get_json()
+
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     error = ""
@@ -123,19 +127,16 @@ class MoveBaseClient(object):
 if __name__ == "__main__":
     # Create a node
     rospy.init_node("demo")
-    #rospy.loginfo(rospy.get_param("/use_sim_time"))
 
     host = "0.0.0.0"
     port = 5000
 
-    # start_server()
+    #start_server()
 
     # start webserver on a separate thread from ros
     t = threading.Thread(target=start_server)
     t.daemon = True
     t.start()
-
-    #rospy.loginfo(rospy.get_param("/use_sim_time"))
 
     # # Make sure sim time is working
     while not rospy.Time.now():
@@ -145,22 +146,13 @@ if __name__ == "__main__":
     move_base = MoveBaseClient()
 
     print ("SERVER AND CLIENT STARTED UP")
-    rate = rospy.Rate(15)
-
-    testCalled = False
 
     while not rospy.is_shutdown():
 
-        # rospy.loginfo(rospy.get_param("/use_sim_time"))
-
-        # prevent assumption that destination is (0, 0)
-        if x == 0.3:
-            testCalled = True
+    # prevent assumption that destination is (0, 0)
         if x == 0 and y == 0:
             continue
         rospy.loginfo(x)
         rospy.loginfo(y)
         print "MOVING BASE TO " + str(x) + ", " + str(y)
-        #if testCalled != True:
         move_base.goto(x, y, 0.0)
-        rate.sleep()

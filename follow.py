@@ -79,26 +79,30 @@ def get_direction():
     return direction
 
 def follow():
+    rospy.init_node('follow', anonymous=True)
     TOPIC = 'cmd_vel' #/base_controller/command
     pub = rospy.Publisher(TOPIC, Twist, queue_size=1)
-    rospy.init_node('follow', anonymous=True)
-    rate = rospy.Rate(15)
+    #rate = rospy.Rate(15)
 
     msg = Twist()
     while not rospy.is_shutdown():
         print "FETCH ALIVE"
-        msg.linear.x = 0.0 # Temporary; forces the robot to turn only
+        msg.linear.x = 0.0
+        msg.angular.z = 0.0
         direction = get_direction()
         print direction
-        if direction == 'l' or direction == 'b':
-            msg.angular.z = math.radians(-45)
-        elif direction == 'r' or direction == 'f':
+        if direction == 'l':
             msg.angular.z = math.radians(45)
-        else:
-            msg.angular.z = 0.0
+        elif direction == 'r':
+            msg.angular.z = math.radians(-45)
+        elif direction == 'f':
+            msg.linear.x = 0.5
+        elif direction == 'b':
+            msg.linear.x = -0.5
         print "ANGULAR Z: " + str(msg.angular.z)
+        print "LINEAR  X: " + str(msg.linear.x)
         pub.publish(msg)
-        rate.sleep()
+        rospy.sleep(1.)
 
 if __name__ == "__main__":
     try:
