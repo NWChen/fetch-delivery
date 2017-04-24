@@ -1,14 +1,15 @@
 <html>
-
     <head>
         <title>fetch_delivery</title>
+        <link rel = "stylesheet" href ="static/css/bootstrap.min.css">
         <script src="static/js/speechkitt.js"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+        <!-- <script src="static/js/bootstrap.min.js"></script> -->
     </head>
 
-    <body>
+    <body style = "margin:40px">
         <script>
         console.log("ANNYANG ABOUT TO RUN");
         if (annyang) {
@@ -30,7 +31,8 @@
 
           annyang.addCommands({
             // 'hello': function() { alert('Hello world!'); }
-            'go (to) :location': goToLocation
+            'go (to) (the) :location': goToLocation,
+            'move to :location': goToLocation
           });
 
           // Tell KITT to use annyang
@@ -52,10 +54,13 @@
         }
         </script>
 
+        <h1>Humanoid Robots Final Project: Team 5</h1>
+        <p>This is the web interface to communicate with the Fetch robot. Say commands like "Go home" or "Go to the table" and the robot will move to that location.</p>
+
         <form method="post" action="{{ url_for('pos') }}">
             <input type="number" step="any" placeholder="x" name="x"></input><br>
             <input type="number" step="any" placeholder="y" name="y"></input>
-            <input type="submit">
+            <input type="submit" class = "btn btn-default">
         </form>
 
         <a href = "/add">Add Location</a>

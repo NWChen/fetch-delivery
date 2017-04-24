@@ -2,21 +2,21 @@
 
 import csv
 import copy
-import actionlib
-import rospy
-import roslib
+# import actionlib
+# import rospy
+# import roslib
 
 import threading
 
 from math import sin, cos
-from moveit_python import (MoveGroupInterface,
-                           PlanningSceneInterface,
-                           PickPlaceInterface)
-from moveit_python.geometry import rotate_pose_msg_by_euler_angles
+# from moveit_python import (MoveGroupInterface,
+#                            PlanningSceneInterface,
+#                            PickPlaceInterface)
+# from moveit_python.geometry import rotate_pose_msg_by_euler_angles
 
-from geometry_msgs.msg import PoseStamped
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
-from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes
+# from geometry_msgs.msg import PoseStamped
+# from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+# from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes
 
 # from sqlalchemy import *
 # from sqlalchemy.pool import NullPool
@@ -27,7 +27,8 @@ app = Flask(__name__)
 x = 0
 y = 0
 
-NAV_FILE = "/home/nwchen/fetch_ws/src/fetch_gazebo/fetch_gazebo_demo/scripts/navigation_labels.txt"
+# NAV_FILE = "/home/nwchen/fetch_ws/src/fetch_gazebo/fetch_gazebo_demo/scripts/navigation_labels.txt"
+NAV_FILE = "navigation_labels.txt"
 
 @app.route('/')
 def index():
@@ -37,7 +38,7 @@ def index():
         nav_list = list(reader)
         f.close()
 
-    print nav_list
+    print(nav_list)
 
     data = []
     for loc in nav_list:
@@ -49,31 +50,55 @@ def index():
 
 @app.route('/pos', methods=['GET', 'POST'])
 def pos():
-    location_name = request.get_json()['location']
-    nav_list = []
-    with open(NAV_FILE, 'r') as f:
-        reader = csv.reader(f)
-        nav_list = list(reader)
-        f.close()
-    
+    location_name = ''
+    if request.get_json() != None:
+        location_name = request.get_json()['location']
     global x
     global y
-    x_pos = 0
-    y_pos = 0
-    for loc in nav_list:
-        if loc[0] == location_name:
-            x_pos = float(loc[1])
-            y_pos = float(loc[2])
-            x = x_pos
-            y = y_pos
-            print "GOING TO " + location_name
-            print x, y
+    if location_name != '':
+        print(location_name)
+        nav_list = []
+        with open(NAV_FILE, 'r') as f:
+            reader = csv.reader(f)
+            nav_list = list(reader)
+            f.close()
 
-    x = x_pos
-    y = y_pos
-    print "X: " + str(x)
-    print "Y: " + str(y)
-    return render_template('index.html')
+        x_pos = 0
+        y_pos = 0
+        for loc in nav_list:
+            if loc[0] == location_name:
+                x_pos = float(loc[1])
+                y_pos = float(loc[2])
+                x = x_pos
+                y = y_pos
+                # print"GOING TO " + location_name
+                # print x, y
+
+        x = x_pos
+        y = y_pos
+        # print "X: " + str(x)
+        # print "Y: " + str(y)
+        print("x_speech", x)
+        print("y_speech", y)
+        return render_template('index.html')
+    else:
+        loc_form_x = ''
+        loc_form_y = ''
+        x_pos = 0
+        y_pos = 0
+        if request.method == 'POST':
+            loc_form_x = request.form['x']
+            loc_form_y = request.form['y']
+            x_pos = float(loc_form_x)
+            y_pos = float(loc_form_y)
+
+        x = x_pos
+        y = y_pos
+        print("x_form", x)
+        print("y_form", y)
+        return render_template('index.html')
+
+
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():
@@ -100,55 +125,55 @@ def start_server():
     app.run(host=host, port=port, threaded=True)
 
 # Move base using navigation stack
-class MoveBaseClient(object):
+# class MoveBaseClient(object):
 
-    def __init__(self):
-        self.client = actionlib.SimpleActionClient("move_base", MoveBaseAction)
-        rospy.loginfo("Waiting for move_base...")
-        self.client.wait_for_server()
+#     def __init__(self):
+#         self.client = actionlib.SimpleActionClient("move_base", MoveBaseAction)
+#         rospy.loginfo("Waiting for move_base...")
+#         self.client.wait_for_server()
 
-    def goto(self, x, y, theta, frame="map"):
-        move_goal = MoveBaseGoal()
-        move_goal.target_pose.pose.position.x = x
-        move_goal.target_pose.pose.position.y = y
-        move_goal.target_pose.pose.orientation.z = sin(theta/2.0)
-        move_goal.target_pose.pose.orientation.w = cos(theta/2.0)
-        move_goal.target_pose.header.frame_id = frame
-        move_goal.target_pose.header.stamp = rospy.Time.now()
+#     def goto(self, x, y, theta, frame="map"):
+#         move_goal = MoveBaseGoal()
+#         move_goal.target_pose.pose.position.x = x
+#         move_goal.target_pose.pose.position.y = y
+#         move_goal.target_pose.pose.orientation.z = sin(theta/2.0)
+#         move_goal.target_pose.pose.orientation.w = cos(theta/2.0)
+#         move_goal.target_pose.header.frame_id = frame
+#         move_goal.target_pose.header.stamp = rospy.Time.now()
 
-        # TODO wait for things to work
-        self.client.send_goal(move_goal)
-        self.client.wait_for_result()
+#         # TODO wait for things to work
+#         self.client.send_goal(move_goal)
+#         self.client.wait_for_result()
 
 if __name__ == "__main__":
     # Create a node
-    rospy.init_node("demo")
+    # rospy.init_node("demo")
 
     host = "0.0.0.0"
     port = 5000
 
-    #start_server()
+    start_server()
 
     # start webserver on a separate thread from ros
-    t = threading.Thread(target=start_server)
-    t.daemon = True
-    t.start()
+    # t = threading.Thread(target=start_server)
+    # t.daemon = True
+    # t.start()
 
-    # # Make sure sim time is working
-    while not rospy.Time.now():
-        pass
+    # # # Make sure sim time is working
+    # while not rospy.Time.now():
+    #     pass
 
-    # # Setup clients
-    move_base = MoveBaseClient()
+    # # # Setup clients
+    # move_base = MoveBaseClient()
 
-    print ("SERVER AND CLIENT STARTED UP")
+    # print ("SERVER AND CLIENT STARTED UP")
 
-    while not rospy.is_shutdown():
+    # while not rospy.is_shutdown():
 
-    # prevent assumption that destination is (0, 0)
-        if x == 0 and y == 0:
-            continue
-        rospy.loginfo(x)
-        rospy.loginfo(y)
-        print "MOVING BASE TO " + str(x) + ", " + str(y)
-        move_base.goto(x, y, 0.0)
+    # # prevent assumption that destination is (0, 0)
+    #     if x == 0 and y == 0:
+    #         continue
+    #     rospy.loginfo(x)
+    #     rospy.loginfo(y)
+    #     print "MOVING BASE TO " + str(x) + ", " + str(y)
+    #     move_base.goto(x, y, 0.0)
