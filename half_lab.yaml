@@ -1,0 +1,7 @@
+image: /home/tim/ros/grasp_ws/robot_ws/src/robot_mapping/maps/half_lab.pgm
+resolution: 0.050000
+origin: [-8.667976, -2.761270, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+
