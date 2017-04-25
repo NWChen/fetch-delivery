@@ -150,7 +150,7 @@ if __name__ == "__main__":
     host = "0.0.0.0"
     port = 5000
 
-    # start_server()
+    #start_server()
 
     # start webserver on a separate thread from ros
     t = threading.Thread(target=start_server)
@@ -158,7 +158,6 @@ if __name__ == "__main__":
     t.start()
 
     #rospy.loginfo(rospy.get_param("/use_sim_time"))
-
     # # Make sure sim time is working
     while not rospy.Time.now():
         pass
