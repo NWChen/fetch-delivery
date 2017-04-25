@@ -9,7 +9,7 @@ from std_msgs.msg import String
 bridge = CvBridge()
 
 def callback(data):
-    rospy.sleep(rospy.Duration(1,0))
+    rospy.sleep(1.)
     try:
         img = bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError, e:
@@ -22,8 +22,8 @@ def im_watcher():
     rospy.init_node('im_watcher', anonymous=True)
     rospy.Subscriber("/head_camera/rgb/image_raw", Image, callback)
     rospy.spin()
-    #rate = rospy.Rate(0.2)
-    #rate.sleep()
+    #rospy.sleep(rospy.Duration(1.,0))
+    #rospy.sleep(1.)
 
 if __name__ == '__main__':
     im_watcher()
