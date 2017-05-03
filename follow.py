@@ -26,6 +26,7 @@ masker = sm.ColorSelector(shifter_color)
 initialArea = None
 initialCentroid = None
 
+#find largest area to be able to track object
 def findLargestContour(contours):
     max_area = 0
     maxIndex = -1
@@ -40,12 +41,15 @@ def findLargestContour(contours):
 def get_direction():
     print "CALLED GET DIRECTION"
     image = cv2.imread(RAW_IMAGE)
+
+    #load in image to create mask to detect color to follow
     masker.loadImage(image)
     mask = masker.getMask()
     print mask
     direction = ''
     _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if len(cnts) > 0:
+        #determine the shape and size of the largest contour area to follow
         print "CNTS LENGTH: " + str(len(cnts))
         blob = findLargestContour(cnts)
         currentArea = cv2.contourArea(blob)
@@ -58,10 +62,12 @@ def get_direction():
             initialArea = currentArea
             initialCentroid = cx
 
+        #get the area ratio in order to keep track of relative distance from object
         areaRatio = currentArea/initialArea
         print "New Area/Initial Area: ", areaRatio
         print "New Centroid, Initial Centroid", initialCentroid, cx
 
+        #determine how to move in order to maintain relative distance
         if cx < initialCentroid - 50:
             print "LEFT"
             direction = 'l'
@@ -79,6 +85,7 @@ def get_direction():
     return direction
 
 def follow():
+
     rospy.init_node('follow', anonymous=True)
     TOPIC = 'cmd_vel' #/base_controller/command
     pub = rospy.Publisher(TOPIC, Twist, queue_size=1)
@@ -101,6 +108,8 @@ def follow():
             msg.linear.x = -0.5
         print "ANGULAR Z: " + str(msg.angular.z)
         print "LINEAR  X: " + str(msg.linear.x)
+
+        #send message to robot to tell it what direction to move
         pub.publish(msg)
         rospy.sleep(1.)
 
