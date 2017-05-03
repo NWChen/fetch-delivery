@@ -1,4 +1,7 @@
 *.pyc
 *.swp
+*.jpeg
 app/*
 old/*
+help/*
+~/*
